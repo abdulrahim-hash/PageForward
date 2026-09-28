@@ -1,0 +1,11 @@
+import { NextResponse } from "next/server";
+import { feedbackSchema } from "@/lib/validation/schemas";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { checkRateLimit } from "@/lib/rate-limit";
+
+async function hashToken(token: string) { const bytes = new TextEncoder().encode(token); const hash = await crypto.subtle.digest("SHA-256", bytes); return Array.from(new Uint8Array(hash)).map((byte) => byte.toString(16).padStart(2, "0")).join(""); }
+
+export async function POST(request: Request) {
+  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown"; if (!checkRateLimit(`feedback:${ip}`, 8).allowed) return NextResponse.json({ message: "Please wait and try again." }, { status: 429 });
+  try { const result = feedbackSchema.safeParse(await request.json()); if (!result.success) return NextResponse.json({ message: result.error.issues[0]?.message }, { status: 400 }); const supabase = createAdminClient(); if (!supabase) return NextResponse.json({ message: "Feedback intake is not configured." }, { status: 503 }); const input = result.data; const tokenHash = await hashToken(input.token); const { data: session } = await supabase.from("sessions").select("id,status").eq("feedback_token_hash", tokenHash).maybeSingle(); if (!session || session.status !== "completed") return NextResponse.json({ message: "This feedback link is invalid or not ready yet." }, { status: 404 }); const { error } = await supabase.from("feedback").insert({ session_id: session.id, respondent_type: input.respondentType, overall_rating: input.overallRating, clarity_rating: input.clarityRating, mentor_rating: input.mentorRating ?? null, recommend: input.recommend, comments: input.comments || null, testimonial: input.testimonial || null, testimonial_permission: input.testimonialPermission, student_attended: input.studentAttended ?? null, additional_guidance_needed: input.additionalGuidanceNeeded ?? null, safety_concern: input.safetyConcern || null }); if (error) return NextResponse.json({ message: "Feedback has already been submitted or could not be saved." }, { status: 409 }); return NextResponse.json({ ok: true }, { status: 201 }); } catch (error) { console.error("feedback_unhandled", error instanceof Error ? error.message : "unknown"); return NextResponse.json({ message: "We couldn’t save your feedback." }, { status: 500 }); }
+}

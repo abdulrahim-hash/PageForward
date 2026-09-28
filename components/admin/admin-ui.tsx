@@ -1,0 +1,3 @@
+export function AdminPageHeader({ eyebrow, title, copy, action }: { eyebrow: string; title: string; copy?: string; action?: React.ReactNode }) { return <header className="admin-page-header"><div><p>{eyebrow}</p><h1>{title}</h1>{copy?<span>{copy}</span>:null}</div>{action}</header>; }
+export function MetricCard({ label, value, note }: { label:string; value:number|string; note?:string }) { return <article className="metric-card"><span>{label}</span><strong>{value}</strong>{note?<p>{note}</p>:null}</article>; }
+export function EmptyAdminState({ title, copy }: { title:string; copy:string }) { return <div className="admin-empty"><span>○</span><h2>{title}</h2><p>{copy}</p></div>; }

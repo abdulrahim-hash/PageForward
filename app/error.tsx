@@ -1,0 +1,2 @@
+"use client";
+export default function ErrorPage({reset}:{error:Error&{digest?:string};reset:()=>void}){return <main className="not-found"><div><p className="eyebrow">SOMETHING WENT WRONG</p><h1>We lost our place for a moment.</h1><p>Your information has not been intentionally discarded. Please try loading this page again.</p><button className="button" onClick={reset}>Try again <span>→</span></button></div></main>}

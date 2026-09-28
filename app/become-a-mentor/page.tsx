@@ -1,0 +1,10 @@
+import type { Metadata } from "next";
+import { MentorApplicationForm } from "@/components/forms/mentor-application-form";
+import { getPublicOfferings } from "@/lib/data/public";
+
+export const metadata: Metadata = { title: "Become a Mentor", description: "Help a future NUST student make a better-informed university decision by sharing your honest experience." };
+
+export default async function BecomeMentorPage({ searchParams }: { searchParams: Promise<{ offering?: string }> }) {
+  const [params, offerings] = await Promise.all([searchParams, getPublicOfferings()]);
+  return <main id="main-content" className="form-page"><section className="mentor-apply-hero"><div className="shell"><p className="eyebrow"><span /> CURRENT NUST STUDENTS</p><h1>Help someone make a better university decision.</h1><p>Remember how uncertain university decisions felt before you joined? Give someone the perspective you wish you had.</p><div className="mentor-commitment"><span><b>20–30 min</b> per conversation</span><span><b>Student-led</b> nonprofit</span><span><b>Your schedule</b> stays flexible</span></div></div></section><section className="shell form-layout mentor-form-layout"><aside><p className="chapter-label">WHAT MENTORING MEANS</p><ul className="mentor-principles"><li><b>Share, don’t sell.</b><p>Your experience is useful precisely because it’s honest.</p></li><li><b>Speak for yourself.</b><p>You’re not an official counsellor or NUST representative.</p></li><li><b>Respect boundaries.</b><p>PageForward mediates scheduling and protects contact details.</p></li></ul><p className="verification-note">Every mentor is manually reviewed and verified before appearing publicly.</p></aside><div><div className="form-intro"><p className="eyebrow">YOUR APPLICATION</p><h2>Tell us about the perspective you can share.</h2><p>Applications never publish automatically. We’ll verify your student status and contact you before creating a profile.</p></div><MentorApplicationForm offerings={offerings} initialOffering={params.offering ?? ""} /></div></section></main>;
+}

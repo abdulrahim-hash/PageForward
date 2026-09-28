@@ -1,0 +1,2 @@
+import Link from "next/link";
+export default function NotFound(){return <main id="main-content" className="not-found"><div><p className="eyebrow">PAGE NOT FOUND</p><h1>This page hasn’t been written yet.</h1><p>The program, mentor or page you’re looking for may have moved.</p><div><Link className="button" href="/programs">Explore Programs <span>→</span></Link><Link className="underlined-link" href="/">Back home</Link></div></div></main>}
